@@ -1,0 +1,2 @@
+Google Maps API Key: AIzaSyCnzou0F4GkOqTHPdFgzKU1ZHZRkMQOXVw
+Server Deployment Tutorial: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
