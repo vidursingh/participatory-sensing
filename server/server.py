@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, abort
 import json
 import urllib
+from utils import decode_polyline
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "somesecretthatonlyiknowandyouwillneverevedfhjklkjhgfdreverget"
@@ -21,7 +22,7 @@ def suggest_route():
 	start = [request.args.get('start_lat'), request.args.get('start_lng')]
 	end = [request.args.get('end_lat'), request.args.get('end_lng')]
 
-	# convert values to floats
+	# convert lat-lng values to floats
 	start = list(map(float, start))
 	end = list(map(float, end))
 
@@ -44,6 +45,20 @@ def suggest_route():
 
 	assert len(waypoint_set) == number_of_routes
 
+	'''
+		The encoded polylines are sourced from Google Maps.
+		It is returned as a response to the Google Maps Directions API.
+		Yet to understand how exactly.
+		Structure of this array: 
+		[
+			[], [], [] 
+		]
+	'''
+	encoded_polyline_set = [
+		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@',
+		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@',
+		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@'
+	]
 	
 	'''
 	This is the final object that will be sent. Structure is as follows:
@@ -59,6 +74,7 @@ def suggest_route():
 	routes = []
 	for i in range(number_of_routes):
 		waypoints = waypoint_set[i]
+		polyline_points = decode_polyline(encoded_polyline_set[i])
 		
 		# construct url
 		baseurl = f'https://www.google.com/maps/dir/'
@@ -74,7 +90,8 @@ def suggest_route():
 		
 		route = {
 			"url": url,
-			"waypoints": waypoints
+			"waypoints": waypoints,
+			"polyline_points": polyline_points
 		}
 
 		routes.append(route)
@@ -84,4 +101,4 @@ def suggest_route():
 
 
 if __name__ == '__main__':
-	app.run(debug=True, port=8080, host='52.127.0.178')
+	app.run(debug=True, port=8080, host='0.0.0.0')
