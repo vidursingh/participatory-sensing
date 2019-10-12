@@ -78,8 +78,8 @@ def suggest_route():
 		color = list(COLORS.values())[i % len(COLORS)]
 
 		# # add start and end point to polyline_points
-		# polyline_points.insert(0, start)
-		# polyline_points.append(end)
+		polyline_points.insert(0, start)
+		polyline_points.append(end)
 
 		
 		# construct url
