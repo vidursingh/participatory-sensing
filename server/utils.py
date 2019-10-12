@@ -8,3 +8,12 @@ def decode_polyline(encoded_polyline):
 	points = list(map(list, points))
 
 	return points
+
+COLORS = {
+	'green': '#DAF7A6',
+	'yellow': '#FFC300',
+	'orange': '#FF5733',
+	'blue': '#2980B9',
+	'grey': '#A6ACAF',
+	'purple': '#6C3483'
+}

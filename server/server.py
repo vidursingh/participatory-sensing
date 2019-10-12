@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, abort
 import json
 import urllib
-from utils import decode_polyline
+from utils import decode_polyline, COLORS
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "somesecretthatonlyiknowandyouwillneverevedfhjklkjhgfdreverget"
@@ -56,8 +56,8 @@ def suggest_route():
 	'''
 	encoded_polyline_set = [
 		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@',
-		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@',
-		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWh@@j@LNHXD\CPENEDOLOVOP?VTn@r@TFPPbBhAfFtCvAdAh@`@lBhBjDvCtCvCrLzKrBzBh@c@@}@oAoAAOEKIMCMG{C?{C?zCFzCBLNX@NnAnAA|@Dr@A^h@^nA@vB@f@u@jH{Kr@oAv@aBbAqE\uAX{@z@sArC}DlEeHjGiJvOgUFs@@c@Ce@Go@a@]qK_KOMPY`CiDrEuGzBeDP_@\aAn@gCj@gC\gAqEoEuCiCcIwHc@UoDfCoAr@YH{BB}MPuDD{@hAO^GTFRJb@Ld@'
+		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nFeDz@_@z@W`Ce@fEWJAJIHODY?w@AUuE}GeDwE[m@c@kAcE_FcCmDeK}NyHwK}BuCeIcKyAaBqE_EsCgC{JmJkGaGoM_M{R{Q{AwA}ImIaAgA[Ew@c@YUWCmFoFyE}EyBuBcA_AmAmAwCkCsBmBMKBQNYRKPEN?`Az@dF~EdBbBj@b@zDxDd@\`Ax@rJpJTY}@mAoAuAyByBq@m@}B_C[a@Qm@oDaEgAaAaDuCkBaBU?SHMTCT@NVVrHjHj@b@zDxDd@\\x@Pb@d@^pDlD`DxCrJnJjU`TbQhPnBfBlDpDpClCzNtMzA|AfCvCzDfF|B~CjEpGrCvDzCxEvBxClBbCt@PL@HFjA`B|@lAx@fApApBlCdDbGtIl@Rv@f@TLTBNEp@a@DKr@sBp@yAr@eArEuGdFeH`@g@BUVg@FQBYgDsFOUvAmB`FeHbCqDfFgHuEyGoCoDk@w@IUIeAWqGA]RAbF_@vFe@bDYrBEjAEnCC~CGbD?jJS?b@sEHuDDc@h@W^O^GTFRJb@Ld@g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nCeBXEp@QtAc@fA[pBa@x@Iz@CfAKvAUb@M\Qv@k@lAkA\w@b@_Af@oAv@_Bj@y@fA}ArGoJr@gADO@SFIX]?KFSXg@BO@QwA_C_BiCrEoGhFuHfFgHqAkBcCmD{BuCs@_AO[GYQqDOuDfBMjPsAbFOjB?@MBEVQr@e@\c@Rm@G_@QcAUyAcAsHgCcR}BwOmAeJyAeK}@\uB`Ay@l@MPy@~Be@bA}AtDOOd@qArAaD~@{BPFw@|Be@bA}AtDw@xAc@l@_@^a@Vo@j@cA^i@Tu@Ps@HiBDkF@o@E?rGAtP?fQFzJ?TRVVXPR|AMtE]tE_@xD[jPsAbFOxFGtD?jJS?b@qGLwB@WZW\S^Od@`@|A',
+		r'g`_mDox~tM`E~GdHuHrF_FtRgQ^_@Nq@lE~D|AnAh@j@~B`CxThWdFdGhGjHlAqCh@u@xAiAbDgClCmBdByAh@i@NQ@IvAmBl@cAjAiBPSl@q@HE^g@fAkBz@gBXu@zAoDTg@b@}@V_@`AiAz@{@Xc@L]Jc@LuAt@yMN{B@aACQjBs@fFeBbBm@nAe@v@WHg@|AoExAe@XMEORIrQoGw@uCqBqHO_@eAm@eFuCyG{DyCsBKGTUdBoBVe@Xo@r@yBlAwDVg@Va@Xw@\{A\iBXkBdAmFNsABcAL}AJq@tA{Fz@qDRcAb@eCP}AJoAL_G?_CcB_OWiCU_BU_AgD{Jm@kBW_AeAiHcBqNm@_FOsBD_BHmALmA@GCCEGIS?]HYRQTEN@FBP?XCpAG`ASf@Oh@_@nByA`BmAbCoBhCkB|LuJdDeC|@u@~@}@^a@V[h@]p@q@nCeBXEp@QtAc@fA[pBa@x@Iz@CfAKvAUb@M\Qv@k@lAkA\w@b@_Af@oAv@_Bj@y@fA}ArGoJr@gADO@SFIX]?KFSXg@BO@QwA_C_BiCrEoGhFuHfFgHqAkBcCmD{BuCs@_AO[GYQqDOuDfBMjPsAbFOjB?@MBEVQr@e@\c@Rm@G_@QcAUyAcAsHgCcR}BwOmAeJyAeK}@\uB`Ay@l@MPy@~Be@bA}AtDOOd@qArAaD~@{BPFw@|Be@bA}AtDw@xAc@l@_@^a@Vo@j@cA^i@Tu@Ps@HiBDkF@o@E?rGAtP?fQFzJ?TRVVXPR|AMtE]tE_@xD[jPsAbFOxFGtD?jJS?b@qGLwB@WZW\S^Od@`@|A'
 	]
 	
 	'''
@@ -75,6 +75,12 @@ def suggest_route():
 	for i in range(number_of_routes):
 		waypoints = waypoint_set[i]
 		polyline_points = decode_polyline(encoded_polyline_set[i])
+		color = list(COLORS.values())[i % len(COLORS)]
+
+		# # add start and end point to polyline_points
+		# polyline_points.insert(0, start)
+		# polyline_points.append(end)
+
 		
 		# construct url
 		baseurl = f'https://www.google.com/maps/dir/'
@@ -88,10 +94,12 @@ def suggest_route():
 		# urlencode the params to construct final url
 		url = baseurl + '?' + urllib.parse.urlencode(url_params)
 		
+		# construct route dict
 		route = {
 			"url": url,
 			"waypoints": waypoints,
-			"polyline_points": polyline_points
+			"polyline_points": polyline_points,
+			"color": color
 		}
 
 		routes.append(route)
