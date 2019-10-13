@@ -10,10 +10,10 @@ def decode_polyline(encoded_polyline):
 	return points
 
 COLORS = {
-	'green': '#DAF7A6',
-	'yellow': '#FFC300',
-	'orange': '#FF5733',
-	'blue': '#2980B9',
+	'purple': '#6C3483',
 	'grey': '#A6ACAF',
-	'purple': '#6C3483'
+	'orange': '#FF5733',
+	'green': '#DAF7A6',
+	'blue': '#2980B9',
+	'pink': '#ff69b4'
 }
